@@ -84,4 +84,3 @@ class Like:
 
     def __str__(self):
         return f"Like ID: {self.like_id}\nDate: {self.dd}-{self.mm}-{self.yy}\nTime: {self.hh}-{self.mn}\nUser ID: {self.user_id}\nPost ID: {self.post_id}"
-    #elf, like_id, dd, mm, yy, hh, mn, user_id, post_id):

@@ -63,7 +63,7 @@ class User:
         try:
             if Post.post_list and Post.getPost(post_id) != None:
                 Like.delete_like(like_id, post_id)
-                
+
         except Exception as e:
             print("[Error]: ", str(e))
 
@@ -73,8 +73,10 @@ class User:
         else:
             print("[Error]: Incorrect password.")
 
-    def update_profile(self, username, email, password, name, lastname, dd_b, mm_b, yy_b):
-        
+    def update_profile(
+        self, username, email, password, name, lastname, dd_b, mm_b, yy_b
+    ):
+
         if username != "":
             self.username = username
         if email != "":
@@ -84,7 +86,7 @@ class User:
         if name != "":
             self.name = name
         if lastname != "":
-            self.lastname = lastname 
+            self.lastname = lastname
         if dd_b != "":
             self.dd_b = dd_b
         if mm_b != "":
@@ -106,29 +108,33 @@ class User:
     @classmethod
     def register(cls, username, email, password, name, lastname, dd_b, mm_b, yy_b):
         try:
-            actual_date = time.localtime()
-            user_id = cls.generate_unique_user_id()
-            dd_r = actual_date.tm_mday
-            mm_r = actual_date.tm_mon
-            yy_r = actual_date.tm_year
-            new_user = cls(
-                user_id,
-                username,
-                email,
-                password,
-                name,
-                lastname,
-                dd_b,
-                mm_b,
-                yy_b,
-                "",
-                dd_r,
-                mm_r,
-                yy_r,
-            )
-            cls.user_list.append(new_user)
-            print("[Register Succesfully]")
-            return new_user
+            if cls.username_available(username) != -1:
+                actual_date = time.localtime()
+                user_id = cls.generate_unique_user_id()
+                dd_r = actual_date.tm_mday
+                mm_r = actual_date.tm_mon
+                yy_r = actual_date.tm_year
+                new_user = cls(
+                    user_id,
+                    username,
+                    email,
+                    password,
+                    name,
+                    lastname,
+                    dd_b,
+                    mm_b,
+                    yy_b,
+                    "",
+                    dd_r,
+                    mm_r,
+                    yy_r,
+                )
+                cls.user_list.append(new_user)
+                print("[Registered Succesfully]")
+                return new_user
+            else:
+                print("[Error]: Username is not available")
+                return None
         except Exception as e:
             print("[Error]: ", str(e))
 
@@ -172,6 +178,16 @@ class User:
         except Exception as e:
             print("[Error]: ", str(e))
             return False
+
+    @classmethod
+    def username_available(cls, username):
+        if cls.user_list:
+            for user in cls.user_list:
+                if user.username == username:
+                    return -1
+            return 0
+        else:
+            return 0
 
     def __str__(self):
         return f"Name: {self.name}\nLastname: {self.lastname}\nUsername: {self.username}\nE-mail: {self.email}\nPassword: {self.password}\nUser ID: {self.user_id}\nRegister Date: {self.dd_r}-{self.mm_r}-{self.yy_r}\nBirthday: {self.dd_b}-{self.mm_b}-{self.yy_b}"
