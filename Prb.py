@@ -20,3 +20,5 @@ Comment.edit_comment(Post.post_list[0].post_id,comment.comment_id,"Acabo de edit
 print(str(comment))
 print("\n")
 print(str(Post.post_list[0].likes[0]))
+print("\n")
+print(str(usuario))

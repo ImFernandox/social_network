@@ -21,6 +21,7 @@ class User:
         dd_r,
         mm_r,
         yy_r,
+        posts,
     ):
         self.user_id = user_id
         self.username = username
@@ -35,6 +36,7 @@ class User:
         self.dd_r = dd_r
         self.mm_r = mm_r
         self.yy_r = yy_r
+        self.posts = posts
 
     def create_post(self, content):
         from .Post import Post
@@ -94,6 +96,12 @@ class User:
         if yy_b != "":
             self.yy_b = yy_b
 
+    def show_posts(self):
+        aux = ""
+        for post in self.posts:
+            aux += str(post)+"\n"
+        return aux
+    
     @classmethod
     def generate_unique_user_id(cls):
         try:
@@ -111,6 +119,7 @@ class User:
             if cls.username_available(username) != -1:
                 actual_date = time.localtime()
                 user_id = cls.generate_unique_user_id()
+                posts = []
                 dd_r = actual_date.tm_mday
                 mm_r = actual_date.tm_mon
                 yy_r = actual_date.tm_year
@@ -128,6 +137,7 @@ class User:
                     dd_r,
                     mm_r,
                     yy_r,
+                    posts
                 )
                 cls.user_list.append(new_user)
                 print("[Registered Succesfully]")
@@ -190,4 +200,7 @@ class User:
             return 0
 
     def __str__(self):
-        return f"Name: {self.name}\nLastname: {self.lastname}\nUsername: {self.username}\nE-mail: {self.email}\nPassword: {self.password}\nUser ID: {self.user_id}\nRegister Date: {self.dd_r}-{self.mm_r}-{self.yy_r}\nBirthday: {self.dd_b}-{self.mm_b}-{self.yy_b}"
+        
+        user_info = f"Name: {self.name}\nLastname: {self.lastname}\nUsername: {self.username}\nE-mail: {self.email}\nPassword: {self.password}\nUser ID: {self.user_id}\nRegister Date: {self.dd_r}-{self.mm_r}-{self.yy_r}\nBirthday: {self.dd_b}-{self.mm_b}-{self.yy_b}\n"
+        post_info = "Posts: \n\n" + self.show_posts()
+        return user_info + post_info

@@ -24,6 +24,7 @@ class Post:
         actual_date = time.localtime()
         comments = []
         likes = []
+        user = User.getProfile(user_id)
         dd = actual_date.tm_mday
         mm = actual_date.tm_mon
         yy = actual_date.tm_year
@@ -33,6 +34,8 @@ class Post:
             post_id = cls.generate_unique_post_id(user_id)
             new_post = cls(post_id, content, dd, mm, yy, hh, mn, user_id, likes, comments)
             cls.post_list.append(new_post)
+            user.posts.append(new_post)
+            
 
 
     @classmethod
@@ -59,12 +62,14 @@ class Post:
             print("[Error]: ", str(e))
 
     @classmethod
-    def delete_post(cls, post_id):
+    def delete_post(cls, post_id, user_id):
         try:
             if cls.post_list and cls.getPost(post_id) != None:
                 post = cls.getPost(post_id)
+                user = User.getProfile(user_id)
                 cls.post_list.remove(post)
                 cls.list_id.remove(post.post_id)
+                user.posts.remove(post)
         except Exception as e:
             print("[Error]: ", str(e))
 
