@@ -12,8 +12,8 @@ class User:
         username,
         email,
         password,
-        name,
-        lastname,
+        first_name,
+        last_name,
         dd_b,
         mm_b,
         yy_b,
@@ -27,8 +27,8 @@ class User:
         self.username = username
         self.email = email
         self.password = password
-        self.name = name
-        self.lastname = lastname
+        self.first_name = first_name
+        self.last_name = last_name
         self.dd_b = dd_b
         self.mm_b = mm_b
         self.yy_b = yy_b
@@ -76,7 +76,7 @@ class User:
             print("[Error]: Incorrect password.")
 
     def update_profile(
-        self, username, email, password, name, lastname, dd_b, mm_b, yy_b
+        self, username, email, password, first_name, last_name, dd_b, mm_b, yy_b
     ):
 
         if username != "":
@@ -85,10 +85,10 @@ class User:
             self.email = email
         if password != "":
             self.password = password
-        if name != "":
-            self.name = name
-        if lastname != "":
-            self.lastname = lastname
+        if first_name != "":
+            self.first_name = first_name
+        if last_name != "":
+            self.last_name = last_name
         if dd_b != "":
             self.dd_b = dd_b
         if mm_b != "":
@@ -99,9 +99,9 @@ class User:
     def show_posts(self):
         aux = ""
         for post in self.posts:
-            aux += str(post)+"\n"
+            aux += str(post) + "\n"
         return aux
-    
+
     @classmethod
     def generate_unique_user_id(cls):
         try:
@@ -114,7 +114,9 @@ class User:
             print("[Error]: ", str(e))
 
     @classmethod
-    def register(cls, username, email, password, name, lastname, dd_b, mm_b, yy_b):
+    def register(
+        cls, username, email, password, first_name, last_name, dd_b, mm_b, yy_b
+    ):
         try:
             if cls.username_available(username) != -1:
                 actual_date = time.localtime()
@@ -128,8 +130,8 @@ class User:
                     username,
                     email,
                     password,
-                    name,
-                    lastname,
+                    first_name,
+                    last_name,
                     dd_b,
                     mm_b,
                     yy_b,
@@ -137,7 +139,7 @@ class User:
                     dd_r,
                     mm_r,
                     yy_r,
-                    posts
+                    posts,
                 )
                 cls.user_list.append(new_user)
                 print("[Registered Succesfully]")
@@ -200,7 +202,7 @@ class User:
             return 0
 
     def __str__(self):
-        
-        user_info = f"Name: {self.name}\nLastname: {self.lastname}\nUsername: {self.username}\nE-mail: {self.email}\nPassword: {self.password}\nUser ID: {self.user_id}\nRegister Date: {self.dd_r}-{self.mm_r}-{self.yy_r}\nBirthday: {self.dd_b}-{self.mm_b}-{self.yy_b}\n"
+
+        user_info = f"First Name: {self.first_name}\nLast Name: {self.last_name}\nUsername: {self.username}\nE-mail: {self.email}\nPassword: {self.password}\nUser ID: {self.user_id}\nRegister Date: {self.dd_r}-{self.mm_r}-{self.yy_r}\nBirthday: {self.dd_b}-{self.mm_b}-{self.yy_b}\n"
         post_info = "Posts: \n\n" + self.show_posts()
         return user_info + post_info
