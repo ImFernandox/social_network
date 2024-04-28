@@ -98,8 +98,9 @@ class User:
 
     def show_posts(self):
         aux = ""
-        for post in self.posts:
-            aux += str(post) + "\n"
+        if self.posts != None:
+            for post in self.posts:
+                aux += str(post) + "\n"
         return aux
 
     @classmethod
