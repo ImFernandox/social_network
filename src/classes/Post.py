@@ -30,7 +30,7 @@ class Post:
         yy = actual_date.tm_year
         hh = actual_date.tm_hour
         mn = actual_date.tm_min
-        if User.user_exist(user_id):
+        if User.getProfile(user_id) != None:
             post_id = cls.generate_unique_post_id(user_id)
             new_post = cls(post_id, content, dd, mm, yy, hh, mn, user_id, likes, comments)
             cls.post_list.append(new_post)

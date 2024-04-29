@@ -1,10 +1,9 @@
 import time
 import uuid
-
+from .DataBase import DataBase
 
 class User:
-    id_list = []
-    user_list = []
+    database = DataBase()
 
     def __init__(
         self,
@@ -70,31 +69,40 @@ class User:
             print("[Error]: ", str(e))
 
     def change_password(self, old_password, new_password):
-        if self.password == old_password:
-            self.password = new_password
-        else:
-            print("[Error]: Incorrect password.")
+        try:
+            return self.database.change_password(old_password, new_password, self.user_id)
+        except Exception as e:
+            print(str(e))
 
     def update_profile(
-        self, username, email, password, first_name, last_name, dd_b, mm_b, yy_b
+        self, username, email, first_name, last_name, dd_b, mm_b, yy_b, biography
     ):
 
         if username != "":
             self.username = username
+            self.database.update_profile_db("username", username,self.user_id)
         if email != "":
             self.email = email
-        if password != "":
-            self.password = password
+            self.database.update_profile_db("email", email, self.user_id)
         if first_name != "":
             self.first_name = first_name
+            self.database.update_profile_db("first_name", first_name, self.user_id)
         if last_name != "":
             self.last_name = last_name
+            self.database.update_profile_db("last_name", last_name, self.user_id)
         if dd_b != "":
             self.dd_b = dd_b
+            self.database.update_profile_db("day_of_birth", dd_b, self.user_id)
         if mm_b != "":
             self.mm_b = mm_b
+            self.database.update_profile_db("month_of_birth", mm_b, self.user_id)
         if yy_b != "":
             self.yy_b = yy_b
+            self.database.update_profile_db("year_of_birth", yy_b, self.user_id)
+        if biography != "":
+            self.biographself = biography
+            self.database.update_profile_db("biography", biography, self.user_id)
+            print("a")
 
     def show_posts(self):
         aux = ""
@@ -108,11 +116,14 @@ class User:
         try:
             while True:
                 user_id = str(uuid.uuid4())
-                if not cls.id_list or user_id not in cls.id_list:
-                    cls.id_list.append(user_id)
+                sql = "SELECT user_id FROM user WHERE user_id = %s"
+                cls.database.cursor.execute(sql, (user_id,))
+                result = cls.database.cursor.fetchone()
+                if not result:
                     return user_id
         except Exception as e:
             print("[Error]: ", str(e))
+            return None
 
     @classmethod
     def register(
@@ -142,7 +153,9 @@ class User:
                     yy_r,
                     posts,
                 )
-                cls.user_list.append(new_user)
+                user_data = (new_user.user_id, new_user.username, new_user.email, new_user.password, new_user.first_name, new_user.last_name, new_user.dd_b, new_user.mm_b,
+                new_user.yy_b, new_user.biography, new_user.dd_r, new_user.mm_r, new_user.yy_r)
+                cls.database.insert_user(user_data)
                 print("[Registered Succesfully]")
                 return new_user
             else:
@@ -154,53 +167,24 @@ class User:
     @classmethod
     def login(cls, username, password):
         try:
-            for user in cls.user_list:
-                if user.username == username:
-                    if user.password == password:
-                        return True
-            return False
+            cls.database.login(username, password)
         except Exception as e:
             print("[Error]: ", str(e))
 
     @classmethod
     def getProfile(cls, user_id):
         try:
-            if cls.user_list:
-                for user in cls.user_list:
-                    if user.user_id == user_id:
-                        return user
-                return None
-            else:
-                print("[User not exist]")
-                return None
+            return cls.database.getProfile(user_id)
         except Exception as e:
             print("[Error]: ", str(e))
             return None
 
     @classmethod
-    def user_exist(cls, user_id):
-        try:
-            if cls.user_list:
-                for user in cls.user_list:
-                    if user.user_id == user_id:
-                        return True
-                return False
-            else:
-                print("[User not exist]")
-                return False
-        except Exception as e:
-            print("[Error]: ", str(e))
-            return False
-
-    @classmethod
     def username_available(cls, username):
-        if cls.user_list:
-            for user in cls.user_list:
-                if user.username == username:
-                    return -1
-            return 0
-        else:
-            return 0
+        try:
+            return cls.database.username_available(username)
+        except Exception as e:
+            print(str(e))
 
     def __str__(self):
 

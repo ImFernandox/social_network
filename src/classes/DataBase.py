@@ -14,21 +14,6 @@ class DataBase:
         self.cursor = self.connection.cursor()
         print("Successfully Connection")
 
-
-    def select_all_users(self):
-        from .User import User
-        sql = 'SELECT*FROM user'
-
-        try:
-            self.cursor.execute(sql)
-            users = self.cursor.fetchall()
-
-            for user in users:
-                user_id, username, email, password, first_name, last_name, dd_b, mm_b, yy_b, biography, dd_r, mm_r, yy_r = user
-                user_obj = User(user_id, username, email, password, first_name, last_name, dd_b, mm_b, yy_b, biography, dd_r, mm_r, yy_r, None)
-                User.user_list.append(user_obj)
-        except Exception as e:
-            raise
     
     def insert_user(self, user_data):
         sql  = """INSERT INTO user (user_id, username, email, user_password, first_name, last_name, day_of_birth,
@@ -42,4 +27,67 @@ class DataBase:
             print("User inserted successfully.")
         except Exception as e:
             self.connection.rollback()
+            print("[Error]: ", str(e))
+
+    def update_profile_db(self, variable, data, user_id):
+        sql = f"""UPDATE user
+                    SET {variable} = %s
+                    WHERE user_id = %s;"""
+        try:
+            self.cursor.execute(sql, (data, user_id))
+            self.connection.commit()
+        except Exception as e:
+            raise
+
+    def login(self, username, password):
+        sql = "SELECT * FROM user WHERE username = %s AND user_password = %s"
+        self.cursor.execute(sql, (username, password))
+        result = self.cursor.fetchone() 
+        if result:
+            print("Successfully Login")
+            return result
+        else:
+            print("Incorrect Username or Password")
+            return None
+        
+    def username_available(self , username):
+        sql = "SELECT * FROM user WHERE username = %s"
+        self.cursor.execute(sql, (username,))
+        result = self.cursor.fetchone() 
+        if result:
+            return -1
+        else:
+            return 0   
+        
+    def getProfile(self, user_id):
+        try:
+            sql = "SELECT * FROM user WHERE user_id = %s"
+            self.database.cursor.execute(sql, (user_id,))
+            result = self.database.cursor.fetchone()
+            
+            if result:
+                user = self(*result)
+                return user
+            else:
+                print("[User not exist]")
+                return None
+        except Exception as e:
+            print("[Error]: ", str(e))
+            return None
+    
+    def change_password(self, old_password, new_password, user_id):
+        try:
+            sql = "SELECT user_id FROM user WHERE user_id = %s AND user_password = %s"
+            self.database.cursor.execute(sql, (user_id, old_password))
+            result = self.database.cursor.fetchone()
+            
+            if result:
+                sql_update = "UPDATE user SET user_password = %s WHERE user_id = %s"
+                self.database.cursor.execute(sql_update, (new_password, user_id))
+                self.database.connection.commit() 
+                self.password = new_password 
+                print("Password changed successfully.")
+            else:
+                print("Incorrect password.")
+        except Exception as e:
             print("[Error]: ", str(e))
