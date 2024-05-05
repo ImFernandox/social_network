@@ -2,9 +2,11 @@ import time
 import uuid
 from .User import User
 from .Post import Post
+from classes_data_base.DataBaseLike import DataBaseLike
 
-class Like: 
-    list_id = []
+
+class Like:
+
     def __init__(self, like_id, dd, mm, yy, hh, mn, user_id, post_id):
         self.like_id = like_id
         self.dd = dd
@@ -18,66 +20,37 @@ class Like:
     @classmethod
     def create_unique_like_id(cls, user_id, post_id):
         try:
-            if User.user_exist(user_id) and Post.getPost(post_id) != None:
-                while True:
-                    user = User.getProfile(user_id)
-                    post = Post.getPost(post_id)
-                    like_id = (
-                        user.username
-                        + "-like="
-                        + str(uuid.uuid4())
-                        + "-"
-                        + post.post_id
-                    )
-                    if not cls.list_id or like_id not in post.likes:
-                        cls.list_id.append(like_id)
-                        return like_id
-            return None
+            return DataBaseLike.create_unique_like_id(user_id, post_id)
         except Exception as e:
             print("[Error]: ", str(e))
 
     @classmethod
-    def create_like(cls,user_id,post_id):
+    def create_like(cls, user_id, post_id):
         try:
-            if User.user_exist(user_id) and Post.getPost(post_id) != None:
+            if User.getProfile(user_id) is not None and Post.getPost(post_id) is not None:
                 actual_date = time.localtime()
-                like_id = Like.create_unique_like_id(user_id, post_id)
-                post = Post.getPost(post_id)
-
                 dd = actual_date.tm_mday
                 mm = actual_date.tm_mon
                 yy = actual_date.tm_year
                 hh = actual_date.tm_hour
                 mn = actual_date.tm_min
-
-                new_like = Like(like_id,dd,mm,yy,hh,mn,user_id,post_id)
-                post.likes.append(new_like)
+                like_id = cls.create_unique_like_id(user_id, post_id)
+                DataBaseLike.insert_like(like_id, dd, mm, yy, hh, mn, user_id, post_id)
+                print("Like created successfully.")
         except Exception as e:
             print("[Error]: ", str(e))
 
     @classmethod
     def delete_like(cls, like_id, post_id):
         try:
-            post = Post.getPost(post_id)
-            if post.likes and cls.getLike(like_id, post_id) != None:
-                like = cls.getLike(like_id, post_id)
-                post.likes.remove(like)
-                cls.list_id.remove(like.like_id)
+            DataBaseLike.delete_like(like_id, post_id)
         except Exception as e:
             print("[Error]: ", str(e))
 
     @classmethod
-    def getLike(cls,like_id, post_id):
+    def get_like(cls, like_id, post_id):
         try:
-            post = Post.getPost(post_id)
-            if post.likes:
-                for like in post.likes:
-                    if like.like_id == like_id:
-                        return like 
-                return None
-            else:
-                print("[Like not exist]")
-                return None
+            return DataBaseLike.get_like(like_id, post_id)
         except Exception as e:
             print("[Error]: ", str(e))
             return None
